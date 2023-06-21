@@ -1,17 +1,31 @@
 import React from 'react';
 import { Square } from './Square.js';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
-export function Board(user){
+export function Board(){
     const [myBoard, setBoard] = useState(Array(9).fill(null));
+    const [currentTurn, setCurrentTurn] = useState(1); //X starts game
+
+    //If even, turn is O. If not, turn is X
+    const currentTurnValue = currentTurn % 2 === 0 ? 'O':'X';
 
     function renderSquare(index) {
-        return <Square value={myBoard[index]} index={index}/>;
+        return <Square value={myBoard[index]} onClick={() => clickSquare(index)} index={index}/>;
     }
+
+    const clickSquare = useCallback((index) => {
+        if(!myBoard[index]) { //if Square is empty, or NULL
+            const newBoard = myBoard.slice();
+            newBoard[index] = currentTurnValue;
+            setBoard(newBoard);
+            setCurrentTurn(prevTurn => prevTurn + 1);
+        }
+    }, [myBoard, setBoard]);
+
 
     return (
         <div>
-            <div class="board">
+            <div className="board">
                 {renderSquare(0)}
                 {renderSquare(1)}
                 {renderSquare(2)}
