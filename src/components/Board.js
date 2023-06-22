@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react';
 
 export function Board(user){
     const [myBoard, setBoard] = useState(Array(9).fill(null));
-    const [currentTurn, setCurrentTurn] = useState(1); //X가 게임 시작
+    const [currentTurn, setCurrentTurn] = useState(1);
     const winner = calculateWinner(myBoard);
 
     //짝수일때 O의 차례. 아님 X차례
@@ -17,7 +17,6 @@ export function Board(user){
     }
 
     function calculateWinner(myBoard){
-
         //게임 이길수있는 가로, 세로, 대각선 인덱스
         const lines = [    
             [0, 1, 2],
@@ -49,6 +48,10 @@ export function Board(user){
         else{ return ("Next Player: " + currentTurnValue);}
     }
 
+    function resetBoard() {
+        setBoard(Array(9).fill(null));
+    }
+
     const clickSquare = useCallback((index) => {
         if(!myBoard[index] && !gameHasWinner && !isBoardFull) { //게임에 룰에 따라 click 허용
             const newBoard = myBoard.slice();
@@ -72,6 +75,7 @@ export function Board(user){
                 {renderSquare(7)}
                 {renderSquare(8)}
             </div>
+            <button className="resetButton" onClick={resetBoard}>Reset Board</button>
         </div>
     );
 }
