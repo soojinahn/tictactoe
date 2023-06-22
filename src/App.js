@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Board } from './Board.js';
-import './Board.css';
+import { Board } from './components/Board.js';
+import './components/Board.css';
 
 function App() {
 
