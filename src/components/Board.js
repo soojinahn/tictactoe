@@ -1,6 +1,10 @@
 import React from 'react';
 import { Square } from './Square.js';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { io } from 'socket.io-client';
+
+const socket = io();
+export default socket;
 
 export function Board(user){
     const [myBoard, setBoard] = useState(Array(9).fill(null));
@@ -60,6 +64,12 @@ export function Board(user){
             setCurrentTurn(prevTurn => prevTurn + 1);
         }
     }, [myBoard, setBoard]);
+
+    useEffect(() => {
+        socket.on('connect', () => {
+          console.log("I am connected")
+        });
+      }, []);
 
     return (
         <div>
