@@ -1,6 +1,6 @@
 import os, json
 from dotenv import load_dotenv
-from flask import Flask, send_from_directory, json
+from flask import Flask, send_from_directory, json, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 import firebase_admin
@@ -11,6 +11,8 @@ load_dotenv()
 app = Flask(__name__, static_folder='./build/static')
 app.config['SECRET_KEY'] = 'secret!'
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
+
+users = []
 
 socketio = SocketIO(
     app,
@@ -38,6 +40,14 @@ def index(filename):
 @socketio.on('connect')
 def on_connect():
     print("User Connected!")
+
+@socketio.on('logging_in') 
+def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보내는 갑
+    user = data['userName']
+    if user not in users:
+        users.append(user)
+
+    socketio.emit('logging_in', users, room=request.sid)
 
 socketio.run(
     app,

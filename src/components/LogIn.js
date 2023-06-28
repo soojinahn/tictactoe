@@ -1,13 +1,15 @@
 import React from 'react';
 import { useRef } from 'react';
+import socket from './Board.js';
 
 export function LogIn(){
   
     const inputRef = useRef(null);
     
-    function userLogIn(){
+    function processLogIn(){
       if(inputRef != null){
         const userName = inputRef.current.value;
+        socket.emit('logging_in', { userName: userName });
       }
     }
     
@@ -16,7 +18,7 @@ export function LogIn(){
         <div class='login'>
           <h2>Log In</h2>
           <input ref={inputRef} type='text' />
-          <button onClick={userLogIn}>Log In</button>
+          <button onClick={processLogIn}>Log In</button>
         </div>
         );
     }
