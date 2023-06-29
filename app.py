@@ -13,6 +13,7 @@ app.config['SECRET_KEY'] = 'secret!'
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 users = []
+userIDs = {}
 
 socketio = SocketIO(
     app,
@@ -28,8 +29,7 @@ firebase_admin.initialize_app(cred, {
 })
 
 #DB에서 존재하는 Person 데이터셋 불러옴
-ref = db.reference('/Person')
-print(ref.get())
+users_ref = db.reference('/Person')
 
 @app.route('/', defaults={"filename": "index.html"})
 
@@ -41,13 +41,24 @@ def index(filename):
 def on_connect():
     print("User Connected!")
 
+@socketio.on('disconnect')
+def on_disconnect():
+    if request.sid in userIDs.keys():
+        delete = userIDs[str(request.sid)]
+        del userIDs[str(request.sid)]
+        users.remove(delete)
+    
+    socketio.emit('userlist', users, include_self=True)
+
 @socketio.on('logging_in') 
 def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보내는 갑
-    user = data['userName']
-    if user not in users:
-        users.append(user)
+    name = data['userName']
+    if name not in users:
+        userIDs[str(request.sid)] = name
+        users.append(name)
 
-    socketio.emit('logging_in', users, room=request.sid)
+    socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
+    socketio.emit('userlist', users, include_self=True) #모든 client한테 새로운 유저리스트 전송
 
 socketio.run(
     app,
