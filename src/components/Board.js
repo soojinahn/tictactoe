@@ -63,7 +63,7 @@ export function Board(user){
             setBoard(newBoard);
             setCurrentTurn(prevTurn => prevTurn + 1);
         }
-    }, [myBoard, setBoard]);
+    }, [myBoard]);
 
     useEffect(() => {
         socket.on('connect', () => {

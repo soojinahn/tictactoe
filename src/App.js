@@ -10,16 +10,28 @@ function App() {
     const [isLoggedIn, setLogIn] = useState(false);
 
     function renderBoard() {
-        return (
-            <div>
-                <Board />
-            </div>
-        )
+        if(isLoggedIn) {
+            return (
+                <div>
+                    <Board />
+                </div>
+            )
+        }
     }
 
     function renderLogIn() {
         if (!isLoggedIn) {return (<LogIn />);}
         return
+    }
+
+    function logout() {
+        if(isLoggedIn) {
+            return (
+                <div className="logout">
+                <button onClick={() => setLogIn(false)}>Logout</button>
+                </div>
+            );
+        }
     }
 
     useEffect(() => {
@@ -32,6 +44,7 @@ function App() {
         <div className="container">
             {renderLogIn()}
             {renderBoard()}
+            {logout()}
         </div>
     );
 }
