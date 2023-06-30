@@ -29,7 +29,7 @@ firebase_admin.initialize_app(cred, {
 })
 
 #DB에서 존재하는 Person 데이터셋 불러옴
-users_ref = db.reference('/Person')
+users_ref = db.reference('/User')
 
 @app.route('/', defaults={"filename": "index.html"})
 
@@ -52,10 +52,25 @@ def on_disconnect():
 
 @socketio.on('logging_in') 
 def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보내는 갑
+    
     name = data['userName']
+
     if name not in users:
         userIDs[str(request.sid)] = name
         users.append(name)
+
+    userlist = users_ref.get() #JSON object를 Firebase에서 불러온다
+    user_exists = False
+    name_lower = name.lower()
+    for user in userlist: #로그인한 유저가 Database에 존재 하는지 체크한다
+        if(user.lower() == name_lower): user_exists = True
+
+    if not user_exists: #새로운 유저는 Database에 새로 올려준다
+        users_ref.update({
+            str(name): {
+                'score': 50
+            }
+        })
 
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
     socketio.emit('userlist', users, include_self=True) #모든 client한테 새로운 유저리스트 전송
