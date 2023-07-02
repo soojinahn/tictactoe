@@ -12,8 +12,7 @@ app = Flask(__name__, static_folder='./build/static')
 app.config['SECRET_KEY'] = 'secret!'
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-users = []
-userIDs = {}
+userlist = {'X': None, "O": None, "spectators": []}
 
 socketio = SocketIO(
     app,
@@ -32,48 +31,53 @@ firebase_admin.initialize_app(cred, {
 users_ref = db.reference('/User')
 
 @app.route('/', defaults={"filename": "index.html"})
-
 @app.route('/<path:filename>')
 def index(filename):
     return send_from_directory('./build', filename)
 
-@socketio.on('connect')
-def on_connect():
-    print("User Connected!")
+#새로운 유저 player assignment
+def add_user_to_list(username, userlist):
 
-@socketio.on('disconnect')
-def on_disconnect():
-    if request.sid in userIDs.keys():
-        delete = userIDs[str(request.sid)]
-        del userIDs[str(request.sid)]
-        users.remove(delete)
+    if userlist['X'] is None:
+        userlist['X'] = username
+    elif userlist['O'] is None:
+        userlist['O'] = username
+    else:
+        userlist['spectators'].append(username)
     
-    socketio.emit('userlist', users, include_self=True)
+    return userlist
+
+#로그인한 유저가 Database에 존재 하는지 체크한다
+def check_if_exists(username):
+    db_users = users_ref.get() #JSON object를 Firebase에서 불러온다
+    name_lower = username.lower()
+
+    for each in db_users: 
+        if(each.lower() == name_lower): return True
+
+    return False
+
+def add_user_to_db(username):
+    users_ref.update({
+    str(username): {
+        'score': 100
+    }
+    })
 
 @socketio.on('logging_in') 
 def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보내는 갑
     
-    name = data['userName']
+    global userlist
 
-    if name not in users:
-        userIDs[str(request.sid)] = name
-        users.append(name)
+    name = data['username']
+    userlist = add_user_to_list(name, userlist)
 
-    userlist = users_ref.get() #JSON object를 Firebase에서 불러온다
-    user_exists = False
-    name_lower = name.lower()
-    for user in userlist: #로그인한 유저가 Database에 존재 하는지 체크한다
-        if(user.lower() == name_lower): user_exists = True
-
-    if not user_exists: #새로운 유저는 Database에 새로 올려준다
-        users_ref.update({
-            str(name): {
-                'score': 50
-            }
-        })
+    exists = check_if_exists(name)
+    if not exists:
+        add_user_to_db(name)
 
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
-    socketio.emit('userlist', users, include_self=True) #모든 client한테 새로운 유저리스트 전송
+    socketio.emit('userlist', userlist, include_self=True)
 
 socketio.run(
     app,

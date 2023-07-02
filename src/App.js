@@ -8,24 +8,25 @@ import socket from './components/Board.js';
 function App() {
 
     const [isLoggedIn, setLogIn] = useState(false);
-    const [userName, setUserName] = useState("");
-    const [userList, setUserList] = useState([]);
-    let playerX, playerO;
-    let spectators = ""
+    const [username, setUsername] = useState("");
+    const [userlist, setUserlist] = useState({"X":"", "O":"", "spectators": []});
+    let playerX, playerO, isSpect;
+    let spectators = "";
 
     function renderBoard() {
         if(isLoggedIn) {
+            isSpect = userlist["spectators"].includes(username) ? true:false;
             return (
                 <div>
-                    <Board />
+                    <Board username={username} playerX={playerX} playerO={playerO} isSpect={isSpect}/>
                 </div>
             )
         }
     }
 
     function renderLogIn() {
-        if (!isLoggedIn) {return (<LogIn />);}
-        return
+        if (!isLoggedIn) {
+            return (<LogIn />);}
     }
 
     function logout() {
@@ -40,13 +41,13 @@ function App() {
     
     function renderUserList() {
         if(isLoggedIn) {
-            if(userList[0]) playerX = userList[0]
-            if(userList[1]) playerO = userList[1]
-            if(userList[2]) spectators = userList.slice(2).map(user => spectators + " " + user);
+            playerX = userlist.X;
+            playerO = userlist.O;
+            spectators = userlist.spectators.map(each => spectators + " " + each);
 
             return (
                 <div class="userlist">
-                    <h1>{userName}'s Tic Tac Toe</h1>
+                    <h1>{username}'s Tic Tac Toe</h1>
                     <h2>Player X: {playerX}</h2>
                     <h2>Player O: {playerO}</h2>
                     <h3>Spectators: {spectators}</h3>
@@ -58,13 +59,13 @@ function App() {
     useEffect(() => {
         socket.on('logging_in', (data) => {
             setLogIn(true);
-            setUserName(data);
+            setUsername(data);
         });
     }, []);
 
     useEffect(() => {
         socket.on('userlist', (data) => {
-            setUserList(data);
+            setUserlist(data);
         });
     }, []);
 

@@ -10,6 +10,10 @@ export function Board(user){
     const [myBoard, setBoard] = useState(Array(9).fill(null));
     const [currentTurn, setCurrentTurn] = useState(1);
     const winner = calculateWinner(myBoard);
+    const username = user.username;
+    const playerX = user.playerX;
+    const playerO = user.playerO;
+    const isSpect = user.isSpect;
 
     //짝수일때 O의 차례. 아님 X차례
     const currentTurnValue = currentTurn % 2 === 0 ? 'O':'X';
@@ -57,19 +61,13 @@ export function Board(user){
     }
 
     const clickSquare = useCallback((index) => {
-        if(!myBoard[index] && !gameHasWinner && !isBoardFull) { //게임에 룰에 따라 click 허용
+        if(!myBoard[index] && !gameHasWinner && !isBoardFull && !isSpect) { //게임에 룰에 따라 click 허용
             const newBoard = myBoard.slice();
             newBoard[index] = currentTurnValue;
             setBoard(newBoard);
             setCurrentTurn(prevTurn => prevTurn + 1);
         }
     }, [myBoard]);
-
-    useEffect(() => {
-        socket.on('connect', () => {
-          console.log("I am connected")
-        });
-      }, []);
 
     return (
         <div>
