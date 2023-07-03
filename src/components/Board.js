@@ -1,6 +1,6 @@
 import React from 'react';
 import { Square } from './Square.js';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
 const socket = io();
@@ -19,9 +19,10 @@ export function Board(user){
     const currentTurnValue = currentTurn % 2 === 0 ? 'O':'X';
     const gameHasWinner = winner != null;
     const isBoardFull = myBoard.every(cell => cell != null);
+    const whichPlayer = username === playerX ? 'X': 'O' //지금 이 client가 무슨 player인지
 
     function renderSquare(index) {
-        return <Square value={myBoard[index]} onClick={() => clickSquare(index)} index={index}/>;
+        return <Square value={myBoard[index]} onClick={() => clickSquare(index, false)} index={index}/>;
     }
 
     function calculateWinner(myBoard){
@@ -60,14 +61,24 @@ export function Board(user){
         setBoard(Array(9).fill(null));
     }
 
-    const clickSquare = useCallback((index) => {
-        if(!myBoard[index] && !gameHasWinner && !isBoardFull && !isSpect) { //게임에 룰에 따라 click 허용
+    function clickSquare(index, isSocket) {
+        if(!myBoard[index] && !gameHasWinner && !isSpect && whichPlayer===currentTurnValue) { //게임에 룰에 따라 click 허용
             const newBoard = myBoard.slice();
             newBoard[index] = currentTurnValue;
             setBoard(newBoard);
             setCurrentTurn(prevTurn => prevTurn + 1);
+            socket.emit('click', { index, whichPlayer }); 
         }
-    }, [myBoard]);
+    }
+
+    useEffect(() => {
+        socket.on('click', (data) => {
+          const newBoard = myBoard.slice();
+          newBoard[data.index] = data.whichPlayer;
+          setBoard(newBoard);
+          setCurrentTurn(prevTurn => prevTurn + 1);
+        });
+    })
 
     return (
         <div>

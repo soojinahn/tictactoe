@@ -47,6 +47,15 @@ def add_user_to_list(username, userlist):
     
     return userlist
 
+def check_duplicate_user(name):
+    if userlist['X'] == name or userlist['O'] == name:
+        return True
+    else:
+        if name in userlist['spectators']:
+            return True
+    
+    return False
+
 #로그인한 유저가 Database에 존재 하는지 체크한다
 def check_if_exists(username):
     db_users = users_ref.get() #JSON object를 Firebase에서 불러온다
@@ -70,6 +79,11 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
     global userlist
 
     name = data['username']
+    duplicate_user = check_duplicate_user(name)
+    if duplicate_user:
+        print("User already logged in.")
+        return
+
     userlist = add_user_to_list(name, userlist)
 
     exists = check_if_exists(name)
@@ -78,6 +92,11 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
 
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
     socketio.emit('userlist', userlist, include_self=True)
+
+@socketio.on('click')
+def on_click(data):
+    #player가 보드눌를때마다 다른 client들한테 알린다
+    socketio.emit('click', data, include_self=False)
 
 socketio.run(
     app,
