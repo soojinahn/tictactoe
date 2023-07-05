@@ -22,7 +22,7 @@ export function Board(user){
     const whichPlayer = username === playerX ? 'X': 'O' //지금 이 client가 무슨 player인지
 
     function renderSquare(index) {
-        return <Square value={myBoard[index]} onClick={() => clickSquare(index, false)} index={index}/>;
+        return <Square value={myBoard[index]} onClick={() => clickSquare(index)} index={index}/>;
     }
 
     function calculateWinner(myBoard){
@@ -58,27 +58,38 @@ export function Board(user){
     }
 
     function resetBoard() {
-        setBoard(Array(9).fill(null));
+        if(!isSpect && (gameHasWinner || isBoardFull)) {
+            socket.emit('reset');
+        }
     }
 
-    function clickSquare(index, isSocket) {
+    function clickSquare(index) {
         if(!myBoard[index] && !gameHasWinner && !isSpect && whichPlayer===currentTurnValue) { //게임에 룰에 따라 click 허용
             const newBoard = myBoard.slice();
             newBoard[index] = currentTurnValue;
             setBoard(newBoard);
             setCurrentTurn(prevTurn => prevTurn + 1);
-            socket.emit('click', { index, whichPlayer }); 
+            socket.emit('click', { index, myBoard, whichPlayer }); 
         }
     }
 
     useEffect(() => {
         socket.on('click', (data) => {
-          const newBoard = myBoard.slice();
+          const newBoard = data.myBoard.slice();
           newBoard[data.index] = data.whichPlayer;
           setBoard(newBoard);
-          setCurrentTurn(prevTurn => prevTurn + 1);
+          const nextTurn = data.whichPlayer === 'X' ? 2:1;
+          setCurrentTurn(nextTurn);
         });
-    })
+
+        socket.on('reset', () => {
+            console.log("here");
+            setBoard(Array(9).fill(null));
+            setCurrentTurn(1);
+        });
+
+    }, []);
+
 
     return (
         <div>

@@ -98,6 +98,10 @@ def on_click(data):
     #player가 보드눌를때마다 다른 client들한테 알린다
     socketio.emit('click', data, include_self=False)
 
+@socketio.on('reset')
+def on_reset():
+    socketio.emit('reset', include_self=True)
+
 socketio.run(
     app,
     host=os.getenv('IP', '0.0.0.0'),
