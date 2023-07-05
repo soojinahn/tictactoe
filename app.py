@@ -35,6 +35,23 @@ users_ref = db.reference('/User')
 def index(filename):
     return send_from_directory('./build', filename)
 
+def update_user_score(username, win):
+    #win_status에 따라 선수의 점수가 +/- 10
+    player_info = users_ref.order_by_key().equal_to(str(username)).get() #returns an OrderedDict
+    score = (list(player_info.items())[0][1]['score']) #데이테베이스에서 선수점수를 불러옴니다
+    
+    if win:
+        score += 10
+    else:
+        if score > 0: #선수 점수가 0일때는 뺄셈 하지 안습니다
+            score -= 10
+
+    users_ref.child(username).set({
+        'score': score
+    })
+
+    print(score)
+
 #새로운 유저 player assignment
 def add_user_to_list(username, userlist):
 
@@ -90,6 +107,8 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
     if not exists:
         add_user_to_db(name)
 
+    update_user_score(name, True)
+
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
     socketio.emit('userlist', userlist, include_self=True)
 
@@ -97,6 +116,11 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
 def on_click(data):
     #player가 보드눌를때마다 다른 client들한테 알린다
     socketio.emit('click', data, include_self=False)
+
+@socketio.on('gameover')
+def on_gameover(data):
+    #게임결과 확인
+    update_user_score(data['username'], data['win_status'])
 
 @socketio.on('reset')
 def on_reset():

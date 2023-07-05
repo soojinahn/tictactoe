@@ -58,7 +58,7 @@ export function Board(user){
     }
 
     function resetBoard() {
-        if(!isSpect && (gameHasWinner || isBoardFull)) {
+        if(!isSpect && (gameHasWinner || isBoardFull)) { //게임이 끝났을때만 리셋 할수있다. 관람자는 리셋 할수없음
             socket.emit('reset');
         }
     }
@@ -83,13 +83,15 @@ export function Board(user){
         });
 
         socket.on('reset', () => {
-            console.log("here");
             setBoard(Array(9).fill(null));
             setCurrentTurn(1);
         });
-
     }, []);
 
+    useEffect(() => {
+        const win_status = winner == whichPlayer //현재 선수와 비교
+        socket.emit('gameover', {username, win_status})
+    }, [winner]);
 
     return (
         <div>
