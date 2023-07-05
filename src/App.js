@@ -28,16 +28,6 @@ function App() {
         if (!isLoggedIn) {
             return (<LogIn />);}
     }
-
-    function logout() {
-        if(isLoggedIn) {
-            return (
-                <div className="logout">
-                <button onClick={() => setLogIn(false)}>Logout</button>
-                </div>
-            );
-        }
-    }
     
     function renderUserList() {
         if(isLoggedIn) {
@@ -74,7 +64,6 @@ function App() {
             {renderLogIn()}
             {renderUserList()}
             {renderBoard()}
-            {logout()}
         </div>
     );
 }
