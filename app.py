@@ -95,10 +95,9 @@ def check_if_exists(username):
 def add_user_to_db(username):
     users_ref.update({
     str(username): {
-        'score': 100 #default score
+        'score': 100 #새로운 유저 default score
     }
     })
-
 
 @socketio.on('connect') 
 def testing():
@@ -122,11 +121,12 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
         add_user_to_db(name)
     
     everyone = users_ref.get()
-    leaderboard = (list_users_scores(everyone))
+    scores = (list_users_scores(everyone))
+    print(scores)
 
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
     socketio.emit('userlist', userlist, include_self=True)
-    socketio.emit('leaderboard', leaderboard, include_self=True)
+    socketio.emit('scores', scores, to=request.sid)
 
 @socketio.on('click')
 def on_click(data):
