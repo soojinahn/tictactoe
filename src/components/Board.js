@@ -89,8 +89,11 @@ export function Board(user){
     }, []);
 
     useEffect(() => {
-        const win_status = winner == whichPlayer //현재 선수와 비교
-        socket.emit('gameover', {username, win_status})
+        if(!isSpect && gameHasWinner){
+            const win_status = winner == whichPlayer //현재 선수와 비교
+            console.log("here")
+            socket.emit('gameover', {username, win_status})
+        }
     }, [winner]);
 
     return (

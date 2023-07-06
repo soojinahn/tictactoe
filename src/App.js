@@ -10,6 +10,7 @@ function App() {
     const [isLoggedIn, setLogIn] = useState(false);
     const [username, setUsername] = useState("");
     const [userlist, setUserlist] = useState({"X":"", "O":"", "spectators": []});
+    const [leaderboard, setLeaderboard] = useState(null);
     let playerX, playerO, isSpect;
     let spectators = "";
 
@@ -46,6 +47,35 @@ function App() {
         }
     }
 
+    function renderLeaderboard() {
+        if(isLoggedIn) {
+            const users = leaderboard[0]
+            const scores = leaderboard[1]
+            const table_data = users.map((value, index) => {
+                const score = scores[index]
+                return (
+                    <tr key={index}>
+                        <td>{value}</td>
+                        <td>{score}</td>            
+                    </tr>
+                )
+            });
+            return (
+                <div>
+                    <table class="leaderboard">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>{table_data}</tbody>
+                    </table>
+                </div>
+            );
+        }
+    }
+
     useEffect(() => {
         socket.on('logging_in', (data) => {
             setLogIn(true);
@@ -57,6 +87,9 @@ function App() {
         socket.on('userlist', (data) => {
             setUserlist(data);
         });
+        socket.on('leaderboard', (data) => {
+            setLeaderboard(data);
+        });
     }, []);
 
     return (
@@ -64,6 +97,7 @@ function App() {
             {renderLogIn()}
             {renderUserList()}
             {renderBoard()}
+            {renderLeaderboard()}
         </div>
     );
 }

@@ -50,7 +50,16 @@ def update_user_score(username, win):
         'score': score
     })
 
-    print(score)
+#데이터베이스에서 모은 자료를 array로 이쁘게 정열  
+def list_users_scores(data):
+    users = []
+    scores = []
+
+    for user in data:
+        users.append(user)
+        scores.append(data[user]['score']) #JSON 안에 있는 데이터, score. 예시: {'soup': {'score': 100}, 'chowder': {'score': 70}}
+
+    return [users,scores]
 
 #새로운 유저 player assignment
 def add_user_to_list(username, userlist):
@@ -86,9 +95,14 @@ def check_if_exists(username):
 def add_user_to_db(username):
     users_ref.update({
     str(username): {
-        'score': 100
+        'score': 100 #default score
     }
     })
+
+
+@socketio.on('connect') 
+def testing():
+    return
 
 @socketio.on('logging_in') 
 def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보내는 갑
@@ -106,11 +120,13 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
     exists = check_if_exists(name)
     if not exists:
         add_user_to_db(name)
-
-    update_user_score(name, True)
+    
+    everyone = users_ref.get()
+    leaderboard = (list_users_scores(everyone))
 
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
     socketio.emit('userlist', userlist, include_self=True)
+    socketio.emit('leaderboard', leaderboard, include_self=True)
 
 @socketio.on('click')
 def on_click(data):
