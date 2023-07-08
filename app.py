@@ -13,7 +13,6 @@ app.config['SECRET_KEY'] = 'secret!'
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 userlist = {'X': None, "O": None, "spectators": []}
-
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
@@ -50,6 +49,15 @@ def update_user_score(username, win):
         'score': score
     })
 
+    update_leaderboard()
+
+def update_leaderboard():
+    everyone = users_ref.get()
+    scores = (list_users_scores(everyone))
+    print("this is me updating leaderboard")
+
+    socketio.emit('scores', scores, include_self=True)
+ 
 #데이터베이스에서 모은 자료를 array로 이쁘게 정열  
 def list_users_scores(data):
     users = []
@@ -63,7 +71,6 @@ def list_users_scores(data):
 
 #새로운 유저 player assignment
 def add_user_to_list(username, userlist):
-
     if userlist['X'] is None:
         userlist['X'] = username
     elif userlist['O'] is None:
@@ -119,10 +126,9 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
     exists = check_if_exists(name)
     if not exists:
         add_user_to_db(name)
-    
+
     everyone = users_ref.get()
     scores = (list_users_scores(everyone))
-    print(scores)
 
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
     socketio.emit('userlist', userlist, include_self=True)
@@ -135,7 +141,7 @@ def on_click(data):
 
 @socketio.on('gameover')
 def on_gameover(data):
-    #게임결과 확인
+    #게임결과 확인ç
     update_user_score(data['username'], data['win_status'])
 
 @socketio.on('reset')

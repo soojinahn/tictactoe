@@ -1,6 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
-import socket from './Board.js';
+import { useState } from 'react';
 
 export function Leaderboard(props) {
     const [showBoard, setShow] = useState(false);
@@ -8,7 +7,6 @@ export function Leaderboard(props) {
 
     function renderLeaderboard() {
         if(showBoard) {
-            console.log("i am in leaderboard")
             const users = scorelist[0]
             const scores = scorelist[1]
             const table_data = users.map((value, index) => {
@@ -22,7 +20,7 @@ export function Leaderboard(props) {
             });
             return (
                 <div>
-                    <table class="leaderboard">
+                    <table className="leaderboard_table">
                         <thead>
                             <tr>
                                 <th>User</th>
@@ -38,7 +36,9 @@ export function Leaderboard(props) {
 
     return (
         <div>
-            <button onClick={()=> setShow(!showBoard)}>Show/Hide Leaderboard</button>
+            <div className="button-container">
+                <button className="leaderboard-button" onClick={()=> setShow(!showBoard)}>Show/Hide Leaderboard</button>
+            </div>
             {renderLeaderboard()}
         </div>
     )
