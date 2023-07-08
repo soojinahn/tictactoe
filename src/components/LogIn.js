@@ -24,5 +24,4 @@ export function LogIn(props){
     }
   
   return logInScreen();
-
 }

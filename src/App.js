@@ -2,14 +2,17 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Board } from './components/Board.js';
 import { LogIn } from './components/LogIn.js';
-import './components/Board.css';
+import './assets/Board.css';
+import './assets/Leaderboard.css';
 import socket from './components/Board.js';
+import { Leaderboard } from './components/Leaderboard.js';
 
 function App() {
 
     const [isLoggedIn, setLogIn] = useState(false);
     const [username, setUsername] = useState("");
     const [userlist, setUserlist] = useState({"X":"", "O":"", "spectators": []});
+    const [scorelist, setScorelist] = useState([]);
     let playerX, playerO, isSpect;
     let spectators = "";
 
@@ -18,7 +21,7 @@ function App() {
             isSpect = userlist["spectators"].includes(username) ? true:false;
             return (
                 <div>
-                    <Board username={username} playerX={playerX} playerO={playerO} isSpect={isSpect}/>
+                    <Board username={username} playerX={playerX} isSpect={isSpect}/>
                 </div>
             )
         }
@@ -26,7 +29,14 @@ function App() {
 
     function renderLogIn() {
         if (!isLoggedIn) {
-            return (<LogIn />);}
+            return (<LogIn />);
+        }
+    }
+
+    function renderLeaderboard() {
+        if(isLoggedIn) {
+            return (<Leaderboard scorelist={scorelist}/>);
+        }
     }
     
     function renderUserList() {
@@ -36,11 +46,11 @@ function App() {
             spectators = userlist.spectators.map(each => spectators + " " + each);
 
             return (
-                <div class="userlist">
+                <div className="userlist">
                     <h1>{username}'s Tic Tac Toe</h1>
-                    <h2>Player X: {playerX}</h2>
-                    <h2>Player O: {playerO}</h2>
-                    <h3>Spectators: {spectators}</h3>
+                    <h3>Player X: {playerX}</h3>
+                    <h3>Player O: {playerO}</h3>
+                    <h4>Spectators: {spectators}</h4>
                 </div>
             )
         }
@@ -59,12 +69,24 @@ function App() {
         });
     }, []);
 
+    useEffect(() => {
+        socket.on('scores', (data) => {
+            setScorelist(data);
+        });
+    }, []);
+
     return (
-        <div className="container">
-            {renderLogIn()}
-            {renderUserList()}
-            {renderBoard()}
+        <div className="app">
+            <div className="game_container">
+                {renderLogIn()}
+                {renderUserList()}
+                {renderBoard()}
+            </div>
+            <div className="leaderboard">
+                {renderLeaderboard()}
+            </div>
         </div>
+
     );
 }
 

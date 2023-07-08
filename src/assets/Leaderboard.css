@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
+.leaderboard-table{
+    margin: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid black;
+    padding: 5px;
+}
+
+.leaderboard-button, .reset-button {
+    color: rgba(0, 0, 0, 0.85);
+    align-items: center;
+    background-color: #FFFFFF;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: .25rem;
+    box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+    box-sizing: border-box;
+
+    cursor: pointer;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 1.25;
+    margin: 5px;
+    min-height: 3rem;
+    padding: calc(.875rem - 10px) calc(1.5rem - 1px);
+    position: relative;
+    text-decoration: none;
+    transition: all 250ms;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: baseline;
+    width: auto;
+}
+

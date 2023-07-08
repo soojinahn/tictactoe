@@ -1,6 +1,6 @@
 import React from 'react';
-import { Square } from './Square.js';
 import { useState, useEffect } from 'react';
+import { Square } from './Square.js';
 import { io } from 'socket.io-client';
 
 const socket = io();
@@ -12,7 +12,6 @@ export function Board(user){
     const winner = calculateWinner(myBoard);
     const username = user.username;
     const playerX = user.playerX;
-    const playerO = user.playerO;
     const isSpect = user.isSpect;
 
     //짝수일때 O의 차례. 아님 X차례
@@ -58,7 +57,7 @@ export function Board(user){
     }
 
     function resetBoard() {
-        if(!isSpect && (gameHasWinner || isBoardFull)) {
+        if(!isSpect && (gameHasWinner || isBoardFull)) { //게임이 끝났을때만 리셋 할수있다. 관람자는 리셋 할수없음
             socket.emit('reset');
         }
     }
@@ -83,13 +82,17 @@ export function Board(user){
         });
 
         socket.on('reset', () => {
-            console.log("here");
             setBoard(Array(9).fill(null));
             setCurrentTurn(1);
         });
-
     }, []);
 
+    useEffect(() => {
+        if(!isSpect && gameHasWinner){
+            const win_status = winner === whichPlayer //현재 선수와 비교
+            socket.emit('gameover', {username, win_status})
+        }
+    }, [winner]);
 
     return (
         <div>
@@ -105,7 +108,10 @@ export function Board(user){
                 {renderSquare(7)}
                 {renderSquare(8)}
             </div>
-            <button className="resetButton" onClick={resetBoard}>Reset Board</button>
+            <div>
+                <button className="reset-button" onClick={resetBoard}>Reset Board</button>
+            </div>
+
         </div>
     );
 }
