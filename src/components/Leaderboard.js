@@ -20,7 +20,7 @@ export function Leaderboard(props) {
             });
             return (
                 <div>
-                    <table className="leaderboard_table">
+                    <table className="leaderboard-table">
                         <thead>
                             <tr>
                                 <th>User</th>
@@ -36,7 +36,7 @@ export function Leaderboard(props) {
 
     return (
         <div>
-            <div className="button-container">
+            <div>
                 <button className="leaderboard-button" onClick={()=> setShow(!showBoard)}>Show/Hide Leaderboard</button>
             </div>
             {renderLeaderboard()}

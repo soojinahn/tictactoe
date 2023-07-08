@@ -1,6 +1,6 @@
 import React from 'react';
-import { Square } from './Square.js';
 import { useState, useEffect } from 'react';
+import { Square } from './Square.js';
 import { io } from 'socket.io-client';
 
 const socket = io();
@@ -108,9 +108,10 @@ export function Board(user){
                 {renderSquare(7)}
                 {renderSquare(8)}
             </div>
-            <div className="button-container">
+            <div>
                 <button className="reset-button" onClick={resetBoard}>Reset Board</button>
             </div>
+
         </div>
     );
 }

@@ -117,8 +117,7 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
 
     name = data['username']
     duplicate_user = check_duplicate_user(name)
-    if duplicate_user:
-        print("User already logged in.")
+    if duplicate_user: #로그인 되있는 게임유저
         return
 
     userlist = add_user_to_list(name, userlist)
@@ -127,12 +126,12 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
     if not exists:
         add_user_to_db(name)
 
-    everyone = users_ref.get()
-    scores = (list_users_scores(everyone))
+    users = users_ref.get()
+    scores = (list_users_scores(users))
 
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
-    socketio.emit('userlist', userlist, include_self=True)
-    socketio.emit('scores', scores, to=request.sid)
+    socketio.emit('scores', scores, include_self=True)
+    socketio.emit('userlist', userlist, include_self=True) #새로운 유저 로그인할때 모든 유저페이지에 userlist 업데이트
 
 @socketio.on('click')
 def on_click(data):
@@ -141,7 +140,7 @@ def on_click(data):
 
 @socketio.on('gameover')
 def on_gameover(data):
-    #게임결과 확인ç
+    #게임오버 후 승자/패자 점수 업데이트
     update_user_score(data['username'], data['win_status'])
 
 @socketio.on('reset')
