@@ -2,10 +2,10 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { Board } from './components/Board.js';
 import { LogIn } from './components/LogIn.js';
+import { Leaderboard } from './components/Leaderboard.js';
+import socket from './components/Board.js';
 import './assets/Board.css';
 import './assets/Leaderboard.css';
-import socket from './components/Board.js';
-import { Leaderboard } from './components/Leaderboard.js';
 
 function App() {
 
@@ -16,29 +16,12 @@ function App() {
     let playerX, playerO, isSpect;
     let spectators = "";
 
-    function renderBoard() {
-        if(isLoggedIn) {
-            isSpect = userlist["spectators"].includes(username) ? true:false;
-            return (
-                <div>
-                    <Board username={username} playerX={playerX} isSpect={isSpect}/>
-                </div>
-            )
-        }
-    }
-
     function renderLogIn() {
         if (!isLoggedIn) {
             return (<LogIn />);
         }
     }
 
-    function renderLeaderboard() {
-        if(isLoggedIn) {
-            return (<Leaderboard scorelist={scorelist}/>);
-        }
-    }
-    
     function renderUserList() {
         if(isLoggedIn) {
             playerX = userlist.X;
@@ -53,6 +36,23 @@ function App() {
                     <h4>Spectators: {spectators}</h4>
                 </div>
             )
+        }
+    }
+
+    function renderBoard() {
+        if(isLoggedIn) {
+            isSpect = userlist["spectators"].includes(username) ? true:false;
+            return (
+                <div>
+                    <Board username={username} playerX={playerX} isSpect={isSpect}/>
+                </div>
+            )
+        }
+    }
+
+    function renderLeaderboard() {
+        if(isLoggedIn) {
+            return (<Leaderboard scorelist={scorelist}/>);
         }
     }
 
