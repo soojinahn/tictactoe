@@ -131,7 +131,8 @@ def log_in(data): #여기서 data는 socket emit 할때 클라이언트가 보�
 
     socketio.emit('logging_in', name, to=request.sid) #로그인한 게임유저 한테만 전송
     socketio.emit('scores', scores, include_self=True)
-    socketio.emit('userlist', userlist, include_self=True) #새로운 유저 로그인할때 모든 유저페이지에 userlist 업데이트
+    socketio.emit('userlist', userlist, include_self=True) #새로운 유저 로그인할때 userlist 업데이트
+
 
 @socketio.on('click')
 def on_click(data):
