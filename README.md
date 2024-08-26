@@ -96,7 +96,7 @@ export function LogIn(props){
 }
 ~~~
 
-- 로그인 페이지 컴포넌트에서 username이라는 갑을 서버 사이드로 socket.emit을 통해 보낸다
+- 로그인 페이지에서 username이라는 갑을 서버 사이드로 socket.emit을 통해 전송
 
 ### 2. 로그인: server-side (Flask/Python)
 
@@ -167,7 +167,7 @@ function calculateWinner(myBoard){
 ~~~
 - clickSquare(): Player X 또는 Player O가 보드의 Square 컴포넌트를 클릭했을때 불리는 함수
 
-- calculateWinner(): 가로, 세로, 대각선을 확인하여 X또는 O중에 승자가 있는지 알려준다.
+- calculateWinner(): 가로, 세로, 대각선을 확인하여 X또는 O중에 승자가 있는지 알림
 
 
 # Screenshots
